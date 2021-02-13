@@ -37,7 +37,7 @@ case $1 in
                 gpio write $GPIO_MUTE 0
             fi
         fi
-        gpio set_mode $GPIO_MUTE out
+        gpio set_mode $GPIO_MUTE 1
         gpio write $GPIO_MUTE 1
         ;;
     # on
