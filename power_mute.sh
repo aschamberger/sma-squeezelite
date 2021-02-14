@@ -3,16 +3,16 @@
 # squeezelite gpio power script
 # squeezelite -S /path/to/power_mute.sh
 # squeezelite sets $1 to
-#	0: off
-#	1: on
-#	2: init
+#   0: off
+#   1: on
+#   2: init
 
 GPIO=${GPIO:-;;}
 
 IFS=\;
 COUNTER=0
 for token in $GPIO; do
-    case $COUNTER in 
+    case $COUNTER in
         0)
             GPIO_MUTE=$token
             ;;
@@ -23,7 +23,7 @@ for token in $GPIO; do
             GPIO_ALL_MUTE=$token
             ;;
     esac
-	COUNTER=$(($COUNTER+1))
+    COUNTER=$(($COUNTER+1))
 done
 
 case $1 in
@@ -47,7 +47,7 @@ case $1 in
             if [ $RELAY_ON == 0 ]; then
                 gpio write $GPIO_RELAY 1
             fi
-		fi
+        fi
         gpio write $GPIO_MUTE 0
         ;;
     # off
@@ -58,11 +58,11 @@ case $1 in
             IFS=\:
             for token in $GPIO_ALL_MUTE; do
                 if [ -n "$token" ]; then
-					GPIO_ON=$(gpio read $token)
-					if [ GPIO_ON == 1 ]; then
-						ALL_MUTE=0
-						break
-					fi
+                    GPIO_ON=$(gpio read $token)
+                    if [ GPIO_ON == 1 ]; then
+                        ALL_MUTE=0
+                        break
+                    fi
                 fi
             done
             if [ $ALL_MUTE == 1 ]; then
