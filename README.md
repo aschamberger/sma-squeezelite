@@ -18,18 +18,20 @@ sudo docker build -t squeezelite .
 
 With defaults and without GPIO script:
 ```
-sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd squeezelite
+sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc="host" --mount type=bind,source=/etc/asound.conf,target=/etc/asound.conf,readonly squeezelite 
 ```
 
 Custom config via env:
 ```
-sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --env PLAYER_NAME=test123 --env OUTPUT_DEVICE=default --env MAC_ADDRESS=02:00:00:00:00:00 --env GPIO="8;4;8:12:26:20:21::" squeezelite
+sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc="host" --mount type=bind,source=/etc/asound.conf,target=/etc/asound.conf,readonly --env PLAYER_NAME=test123 --env OUTPUT_DEVICE=default --env MAC_ADDRESS=02:00:00:00:00:00 --env GPIO="8;4;8:12:26:20:21::" squeezelite
 ```
 Env variables:
 * PLAYER_NAME: Player name to display in Logitech Media Server
 * OUTPUT_DEVICE: ALSA output device
 * MAC_ADDRESS: mac for LMS player instance
 * GPIO: config for muting amp and power supply (see next section)
+
+Requires access to /dev/gpiomem and /dev/snd devices. The IPC setting is for ALSA dmix to work across containers. The hosts asound.conf is mounted into the container.
 
 ## Power mute script / GPIO config:
 

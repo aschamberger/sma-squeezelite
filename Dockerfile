@@ -31,6 +31,9 @@ RUN addgroup -g 29 -S piaudio \
     && adduser -S squeezelite \
     && addgroup squeezelite piaudio \
 	&& addgroup squeezelite pigpio
+
+# create file to be able to map host asound.conf
+RUN touch /etc/asound.conf
 	
 COPY --from=builder /usr/local/src/squeezelite/squeezelite /usr/local/bin/squeezelite
 #COPY --from=builder /usr/local/src/squeezelite/alsacap /usr/local/bin/alsacap
