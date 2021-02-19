@@ -23,7 +23,7 @@ sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc=
 
 Custom config via env:
 ```
-sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc="host" --mount type=bind,source=/etc/asound.conf,target=/etc/asound.conf,readonly --env PLAYER_NAME=test123 --env OUTPUT_DEVICE=default --env MAC_ADDRESS=02:00:00:00:00:00 --env GPIO="8;4;8:12:26:20:21::" squeezelite
+sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc="host" --mount type=bind,source=/etc/asound.conf,target=/etc/asound.conf,readonly --env PLAYER_NAME=test123 --env OUTPUT_DEVICE=default --env MAC_ADDRESS=02:00:00:00:00:00 --env GPIO="8;4;18:8:12:26:20:21::" squeezelite
 ```
 Env variables:
 * PLAYER_NAME: Player name to display in Logitech Media Server
@@ -39,7 +39,7 @@ A power mute script can mute/power down the connected amp via a GPIO (first para
 
 Pi GPIO config is done using board GPIO numbers (not BCM oder WiringPi numbering scheme) - `<current amp GPIO>;<power relay GPIO>;<all up to 8 amp GPIOs>`:
 ```
-8;4;8:12:26:20:21::
+8;4;18:8:12:26:20:21::
 ```
 
 The [power_mute.sh](power_mute.sh) script is automatically configured via the `-S` squeezelite parameter when the GPIO config is present in the docker run command. 
