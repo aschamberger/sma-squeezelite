@@ -5,7 +5,7 @@
 #include <wiringPi.h>
 
 /*
- * gcc -o gpio gpio.c -Wall -Wextra -I/usr/local/include -Winline -pipe -lwiringPi -lwiringPiDev
+ * gcc -o gpio gpio.c -Wall -Wextra -Winline -I/usr/include -L/usr/lib -pipe -lwiringPi
  */
 
 int main(int argc, char **argv)

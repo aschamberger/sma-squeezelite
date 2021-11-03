@@ -9,6 +9,8 @@
 
 GPIO=${GPIO:-;;}
 
+#echo "power/mute ..."
+
 IFS=\;
 COUNTER=0
 for token in $GPIO; do
@@ -22,6 +24,9 @@ for token in $GPIO; do
         2)
             GPIO_ALL_MUTE=$token
             ;;
+        3)
+            GPIO_SPEAKER_SWITCHER=$token
+            ;;
     esac
     COUNTER=$(($COUNTER+1))
 done
@@ -34,11 +39,12 @@ case $1 in
             RELAY_MODE=$(gpio get_mode $GPIO_RELAY)
             if [ $RELAY_MODE == 0 ]; then
                 gpio set_mode $GPIO_RELAY 1
-                gpio write $GPIO_MUTE 0
+                gpio write $GPIO_RELAY 0
             fi
         fi
         gpio set_mode $GPIO_MUTE 1
         gpio write $GPIO_MUTE 1
+        #echo "init\n"
         ;;
     # on
     1)
@@ -48,11 +54,18 @@ case $1 in
                 gpio write $GPIO_RELAY 1
             fi
         fi
+        if [ -n "$GPIO_SPEAKER_SWITCHER" ]; then
+            gpio write $GPIO_SPEAKER_SWITCHER 1
+        fi
         gpio write $GPIO_MUTE 0
+        #echo "on\n"
         ;;
     # off
     0)
         gpio write $GPIO_MUTE 1
+        if [ -n "$GPIO_SPEAKER_SWITCHER" ]; then
+            gpio write $GPIO_SPEAKER_SWITCHER 0
+        fi
         if [ -n "$GPIO_RELAY" ]; then
             ALL_MUTE=1
             IFS=\:
@@ -69,5 +82,6 @@ case $1 in
                 gpio write $GPIO_RELAY 0
             fi
         fi
+        #echo "off\n"
         ;;
 esac
