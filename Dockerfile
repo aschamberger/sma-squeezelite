@@ -57,13 +57,13 @@ RUN addgroup -g 29 -S piaudio \
 # create file to be able to map host asound.conf
 RUN touch /etc/asound.conf
 # create file to be able to map host squeeze<n>.name
-RUN touch /config/squeeze.name
+RUN mkdir /config && touch /config/squeeze.name
 
 COPY --from=builder /usr/local/src/dest/usr/lib/* /usr/lib/	
 COPY --from=builder /usr/local/src/squeezelite-master/squeezelite /usr/local/bin/squeezelite
 #COPY --from=builder /usr/local/src/squeezelite-master/alsacap /usr/local/bin/alsacap
 #COPY --from=builder /usr/local/src/squeezelite-master/find_servers /usr/local/bin/find_servers
-COPY --from=builder /usr/lib/libwiringPi.so /usr/lib/libwiringPi.so.2.46
+COPY --from=builder /usr/lib/libwiringPi.so* /usr/lib/
 COPY --from=builder /usr/local/src/gpio /usr/local/bin/gpio
 
 COPY power_mute.sh /usr/local/bin/power_mute.sh
