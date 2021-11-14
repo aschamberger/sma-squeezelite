@@ -42,6 +42,14 @@ case $1 in
                 gpio write $GPIO_RELAY 0
             fi
         fi
+        if [ -n "$GPIO_SPEAKER_SWITCHER" ]; then
+            # set output mode if not initialized yet
+            SPEAKER_SWITCHER_MODE=$(gpio get_mode $GPIO_SPEAKER_SWITCHER)
+            if [ $SPEAKER_SWITCHER_MODE == 0 ]; then
+                gpio set_mode $GPIO_SPEAKER_SWITCHER 1
+                gpio write $GPIO_SPEAKER_SWITCHER 0
+            fi
+        fi
         gpio set_mode $GPIO_MUTE 1
         gpio write $GPIO_MUTE 1
         #echo "init\n"
