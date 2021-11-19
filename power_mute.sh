@@ -80,7 +80,7 @@ case $1 in
             for token in $GPIO_ALL_MUTE; do
                 if [ -n "$token" ]; then
                     GPIO_ON=$(gpio read $token)
-                    if [ GPIO_ON == 1 ]; then
+                    if [ $GPIO_ON == 0 ]; then
                         ALL_MUTE=0
                         break
                     fi

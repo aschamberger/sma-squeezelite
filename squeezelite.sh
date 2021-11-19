@@ -9,4 +9,4 @@ if [ -n "$GPIO" ]; then
 fi
 
 # run squeezelite with user squeezelite
-exec su-exec squeezelite squeezelite -N /config/squeeze.name -o $OUTPUT_DEVICE -m $MAC_ADDRESS$POWER_SCRIPT
+exec su-exec squeezelite squeezelite -a 80:::0: -N /config/squeeze.name -o $OUTPUT_DEVICE -m $MAC_ADDRESS$POWER_SCRIPT
