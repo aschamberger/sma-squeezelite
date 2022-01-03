@@ -75,6 +75,7 @@ case $1 in
             gpio write $GPIO_SPEAKER_SWITCHER 0
         fi
         if [ -n "$GPIO_RELAY" ]; then
+            sleep 5
             ALL_MUTE=1
             IFS=\:
             for token in $GPIO_ALL_MUTE; do
