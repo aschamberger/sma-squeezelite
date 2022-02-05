@@ -8,6 +8,7 @@ Features:
 * based on Alpine Linux
 * Container init via [Tini](https://github.com/krallin/tini)
 * rootless via [su-exec](https://github.com/ncopa/su-exec)
+* supports [alsaequal](https://github.com/raedwulf/alsaequal)
 
 ## Docker build
 
@@ -42,7 +43,7 @@ Requires access to /dev/gpiomem and /dev/snd devices. The IPC setting is for ALS
 
 A power mute script can mute/power down the connected amp via a GPIO (first parameter). The second parameter allows to power down the power supply if all connected amps (listed in third parameter) are off. The optional speaker switcher GPIO is used to trigger an external 5V relais changing speakers between sqeezeMultiAmp and another amp in the room.
 
-Pi GPIO config is done using board GPIO numbers (not BCM oder WiringPi numbering scheme) - `<current amp GPIO>;<power relay GPIO>;<all up to 8 amp GPIOs>`(;<speaker switcher GPIO>):
+Pi GPIO config is done using board GPIO numbers (not BCM oder WiringPi numbering scheme) - `<current amp GPIO>;<power relay GPIO>;<all up to 8 amp GPIOs>(;<speaker switcher GPIO>)`:
 ```
 15;7;15:18:22:31:32:36:35:40;11
 ```

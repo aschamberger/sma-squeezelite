@@ -3,7 +3,7 @@ FROM alpine:3.14.2 as builder
 ENV LANG C.UTF-8
 
 RUN apk update \
-    && apk add --no-cache wget unzip build-base autoconf automake wiringpi wiringpi-dev flac-dev alsa-lib-dev faad2-dev mpg123-dev libvorbis-dev libmad-dev soxr-dev openssl-dev opusfile-dev opus-dev libogg-dev libtool
+    && apk add --no-cache wget unzip build-base autoconf automake wiringpi wiringpi-dev flac-dev alsa-lib-dev faad2-dev mpg123-dev libvorbis-dev libmad-dev soxr-dev openssl-dev opusfile-dev opus-dev libogg-dev libtool linux-headers
 
 RUN mkdir -p /usr/local/src \
     && cd /usr/local/src \
@@ -39,6 +39,14 @@ COPY gpio.c /usr/local/src/gpio.c
 
 RUN cd /usr/local/src \
     && gcc -o gpio gpio.c -Wall -Wextra -Winline -I/usr/include -L/usr/lib -pipe -lwiringPi
+    
+RUN cd /usr/local/src \
+    && wget https://github.com/raedwulf/alsaequal/archive/refs/heads/master.zip -O alsaequal.zip \
+    && unzip alsaequal.zip \
+    && cd alsaequal-master \
+    && make \
+    && mkdir -p /usr/lib/alsa-lib \
+    && make install
 
 FROM alpine:3.14.2
 
@@ -46,6 +54,8 @@ ENV LANG C.UTF-8
 
 RUN apk update \
     && apk add --no-cache tini su-exec flac alsa-lib faad2 mpg123 libvorbis libmad soxr openssl opusfile libogg
+
+RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
 
 # add group piaudio and pigpio with gid of underlying raspberry os groups
 RUN addgroup -g 29 -S piaudio \
@@ -65,6 +75,8 @@ COPY --from=builder /usr/local/src/squeezelite-master/squeezelite /usr/local/bin
 #COPY --from=builder /usr/local/src/squeezelite-master/find_servers /usr/local/bin/find_servers
 COPY --from=builder /usr/lib/libwiringPi.so* /usr/lib/
 COPY --from=builder /usr/local/src/gpio /usr/local/bin/gpio
+COPY --from=builder /usr/lib/alsa-lib/libasound_module_pcm_equal.so /usr/lib/alsa-lib/libasound_module_pcm_equal.so
+COPY --from=builder /usr/lib/alsa-lib/libasound_module_ctl_equal.so /usr/lib/alsa-lib/libasound_module_ctl_equal.so
 
 COPY power_mute.sh /usr/local/bin/power_mute.sh
 RUN chmod +x /usr/local/bin/power_mute.sh
