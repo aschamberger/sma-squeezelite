@@ -1,13 +1,13 @@
 #!/bin/sh
 
-# squeezelite gpio power script
+# squeezelite power script
 # squeezelite -S /path/to/power_mute.sh
 # squeezelite sets $1 to
 #   0: off
 #   1: on
 #   2: init
 
-GPIO=${GPIO:-;;}
+POWER=${POWER:-;;;}
 
 #echo "power/mute ..."
 
@@ -26,6 +26,9 @@ for token in $GPIO; do
             ;;
         3)
             GPIO_SPEAKER_SWITCHER=$token
+            ;;
+        4)
+            HASS_SWITCH=$token
             ;;
     esac
     COUNTER=$(($COUNTER+1))
@@ -60,17 +63,34 @@ case $1 in
             RELAY_ON=$(gpio read $GPIO_RELAY)
             if [ $RELAY_ON == 0 ]; then
                 gpio write $GPIO_RELAY 1
+                sleep 2
             fi
         fi
         if [ -n "$GPIO_SPEAKER_SWITCHER" ]; then
             gpio write $GPIO_SPEAKER_SWITCHER 1
         fi
-        gpio write $GPIO_MUTE 0
+        if [ -n "$GPIO_MUTE" ]; then
+            gpio write $GPIO_MUTE 0
+        fi
+        if [ -n "$HASS_SWITCH" ]; then
+            curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
+                -H "Content-Type: application/json" \
+                -d '{"entity_id": "$HASS_SWITCH"}' \
+                http://$HASS_HOST/api/services/switch/turn_on
+        fi
         #echo "on\n"
         ;;
     # off
     0)
-        gpio write $GPIO_MUTE 1
+        if [ -n "$HASS_SWITCH" ]; then
+            curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
+                -H "Content-Type: application/json" \
+                -d '{"entity_id": "$HASS_SWITCH"}' \
+                http://$HASS_HOST/api/services/switch/turn_off
+        fi
+        if [ -n "$GPIO_MUTE" ]; then
+            gpio write $GPIO_MUTE 1
+        fi
         if [ -n "$GPIO_SPEAKER_SWITCHER" ]; then
             gpio write $GPIO_SPEAKER_SWITCHER 0
         fi
