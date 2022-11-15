@@ -4,7 +4,7 @@ OUTPUT_DEVICE=${OUTPUT_DEVICE:-default}
 MAC_ADDRESS=${MAC_ADDRESS:-02:00:00:00:00:00}
 
 POWER_SCRIPT=""
-if [ -n "$GPIO" ]; then
+if [[ -n "$GPIO_PSU_RELAY" || -n "$GPIO_MUTE" || -n "$GPIO_SHUTDOWN" || -n "$GPIO_SPS" || -n "$HASS_SWITCH" ]]; then
     POWER_SCRIPT=" -S /usr/local/bin/power_mute.sh"
 fi
 
