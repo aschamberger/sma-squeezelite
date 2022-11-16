@@ -97,18 +97,8 @@ case $1 in
         fi
         if [[ -n "$GPIO_SHUTDOWN" ]]; then
             if [[ -n "$GPIO_AMP_SHUTDOWN_ON_AMP_MUTE" ]]; then
-                ALL_MUTE=1
-                IFS=\;
-                for token in $GPIO_AMP_SHUTDOWN_ON_AMP_MUTE; do
-                    if [[ -n "$token" ]]; then
-                        GPIO_ON=$(gpio read $token)
-                        if [[ $GPIO_ON == 0 ]]; then
-                            ALL_MUTE=0
-                            break
-                        fi
-                    fi
-                done
-                if [[ $ALL_MUTE == 1 ]]; then
+                GPIO_ON=$(gpio read $GPIO_AMP_SHUTDOWN_ON_AMP_MUTE)
+                if [[ $GPIO_ON == 0 ]]; then
                     gpio write $GPIO_SHUTDOWN 1
                 fi
             else
