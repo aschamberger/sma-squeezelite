@@ -9,6 +9,10 @@
 
 #echo "power/mute ..."
 
+# create lock in order to make sure we have exclusive access to GPIO
+exec 200>/var/lock/gpio || exit 1
+flock 200 || exit 1
+
 case $1 in
     # init
     2)
@@ -29,12 +33,20 @@ case $1 in
             fi
         fi
         if [[ -n "$GPIO_MUTE" ]]; then
-            gpio set_mode $GPIO_MUTE 1
-            gpio write $GPIO_MUTE 1
+            # set output mode if not initialized yet
+            MUTE_MODE=$(gpio get_mode $GPIO_MUTE)
+            if [[ $MUTE_MODE == 0 ]]; then
+                gpio set_mode $GPIO_MUTE 1
+                gpio write $GPIO_MUTE 1
+            fi
         fi
         if [[ -n "$GPIO_SHUTDOWN" ]]; then
-            gpio set_mode $GPIO_SHUTDOWN 1
-            gpio write $GPIO_SHUTDOWN 1
+            # set output mode if not initialized yet
+            SHUTDOWN_MODE=$(gpio get_mode $GPIO_SHUTDOWN)
+            if [[ $SHUTDOWN_MODE == 0 ]]; then
+                gpio set_mode $GPIO_SHUTDOWN 1
+                gpio write $GPIO_SHUTDOWN 1
+            fi
         fi
         #echo "init\n"
         ;;
@@ -128,3 +140,6 @@ case $1 in
         #echo "off\n"
         ;;
 esac
+
+# release gpio lock
+flock -u 200
