@@ -31,7 +31,17 @@ sudo docker run -d --network host --device /dev/gpiomem --device /dev/snd --ipc=
 Env variables:
 * OUTPUT_DEVICE: ALSA output device
 * MAC_ADDRESS: mac for LMS player instance
-* GPIO: config for muting amp and power supply (see next section)
+* HASS_HOST: home assistant IP or hostname
+* HASS_BEARER: home assistant bearer token
+* LMS_HOST: Logitect Media Server IP or hostname
+* GPIO_PSU_RELAY: GPIO number for relay shutting down power supply
+* GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN: GPIO numbers to check for amp shutdown (';' separated)
+* GPIO_AMP_SHUTDOWN_ON_AMP_MUTE: GPIO to check if amp should be shut down
+* GPIO_AMP_MUTE_ON_PLAYERS: mute amp when players muted (list of ';' separated mac addresses)
+* GPIO_MUTE: GPIO to mute amp
+* GPIO_SHUTDOWN: GPIO to shutdown amp
+* GPIO_SPS: speaker switch GPIO
+* HASS_SWITCH: switch that should be controlled via home assistant
 
 Player Name via config file:
 * The best way to define the player name for squeezelite is the -N command line option. 
@@ -41,15 +51,14 @@ Requires access to /dev/gpiomem and /dev/snd devices. The IPC setting is for ALS
 
 ## Power mute script / GPIO config:
 
-A power mute script can mute/power down the connected amp via a GPIO (first parameter). The second parameter allows to power down the power supply if all connected amps (listed in third parameter) are off. The optional speaker switcher GPIO is used to trigger an external 5V relais changing speakers between sqeezeMultiAmp and another amp in the room.
+A power mute script can mute/power down the connected amp via a GPIO. It also allows to power down the power supply if all connected amps are off. 
+The speaker switcher GPIO is used to trigger an external 5V relais changing speakers between sqeezeMultiAmp and another amp in the room.
+Additionally an external switch can be controlled via home assistant.
 
-Pi GPIO config is done using board GPIO numbers (not BCM oder WiringPi numbering scheme) - `<current amp GPIO>;<power relay GPIO>;<all up to 8 amp GPIOs>(;<speaker switcher GPIO>)`:
-```
-15;7;15:18:22:31:32:36:35:40;11
-```
-
-The [power_mute.sh](power_mute.sh) script is automatically configured via the `-S` squeezelite parameter when the GPIO config is present in the docker run command. 
+The [power_mute.sh](power_mute.sh) script is automatically configured via the `-S` squeezelite parameter when one of the relevant ENV vars is present in the docker run command. 
 It uses a custom [gpio control binary](gpio.c) based on [WiringPi](https://github.com/WiringPi/WiringPi).
+
+[flock](https://linux.die.net/man/1/flock) is used to prevent race conditions of parallel running scripts for different player instances.
 
 ## Docker dev
 
@@ -65,3 +74,4 @@ sudo docker exec -it <name> /bin/sh
 Notes:
 * [Squeezelite command line options](https://ralph-irving.github.io/squeezelite.html)
 * [Power script example](https://github.com/ralph-irving/squeezelite/blob/master/tools/gpiopower.sh)
+* [flock example](https://www.kiloroot.com/bash-two-methods-for-job-control-simple-lock-files-and-flock/)
