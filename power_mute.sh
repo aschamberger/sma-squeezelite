@@ -71,7 +71,7 @@ case $1 in
         if [[ -n "$HASS_SWITCH" ]]; then
             curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
                 -H "Content-Type: application/json" \
-                -d '{"entity_id": "$HASS_SWITCH"}' \
+                -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_on
         fi
         #echo "on\n"
@@ -81,7 +81,7 @@ case $1 in
         if [[ -n "$HASS_SWITCH" ]]; then
             curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
                 -H "Content-Type: application/json" \
-                -d '{"entity_id": "$HASS_SWITCH"}' \
+                -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_off
         fi
         if [[ -n "$GPIO_MUTE" ]]; then
@@ -92,11 +92,14 @@ case $1 in
                     if [[ -n "$token" ]]; then
                         # check power state via lms api
                         DATA='{"id": 1, "method": "slim.request", "params":["'"$token"'", ["power", "?"]]}'
-                        POWER=$(curl -H 'Content-Type: application/json' -d '$DATA' http://${LMS_HOST}/jsonrpc.js)
-                        PLAYER_ON=$(echo $POWER | jq -r '.result._power' )
-                        if [[ $PLAYER_ON == 0 ]]; then
-                            ALL_OFF=0
-                            break
+                        POWER=$(curl -H 'Content-Type: application/json' -d "$DATA" http://$LMS_HOST/jsonrpc.js)
+                        # empty result if player not registered
+                        if [[ -n $POWER ]]
+                            PLAYER_ON=$(echo $POWER | jq -r '.result._power' )
+                            if [[ $PLAYER_ON == 0 ]]; then
+                                ALL_OFF=0
+                                break
+                            fi
                         fi
                     fi
                 done

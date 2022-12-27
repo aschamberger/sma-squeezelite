@@ -1,4 +1,4 @@
-FROM alpine:3.16 as builder
+FROM alpine:3.17 as builder
 
 ENV LANG C.UTF-8
 
@@ -24,6 +24,7 @@ RUN mkdir -p /usr/local/src \
     && make DESTDIR="/usr/local/src/dest" install \
     && cd .. \
     && cd tremor-master \
+    && sed -i "s/\(XIPH_PATH_OGG(, AC_MSG_ERROR(must have Ogg installed!))\)/#\1/" configure.in \
     && ./autogen.sh --prefix=/usr --enable-static=no \
     && make \
     && make install \
@@ -48,7 +49,7 @@ RUN cd /usr/local/src \
     && mkdir -p /usr/lib/alsa-lib \
     && make install
 
-FROM alpine:3.16
+FROM alpine:3.17
 
 ENV LANG C.UTF-8
 
