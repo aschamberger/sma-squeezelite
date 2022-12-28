@@ -69,7 +69,7 @@ case $1 in
             gpio write $GPIO_MUTE 0
         fi
         if [[ -n "$HASS_SWITCH" ]]; then
-            curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
+            curl -s -X POST -H "Authorization: Bearer $HASS_BEARER" \
                 -H "Content-Type: application/json" \
                 -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_on
@@ -79,7 +79,7 @@ case $1 in
     # off
     0)
         if [[ -n "$HASS_SWITCH" ]]; then
-            curl -X POST -H "Authorization: Bearer $HASS_BEARER" \
+            curl -s -X POST -H "Authorization: Bearer $HASS_BEARER" \
                 -H "Content-Type: application/json" \
                 -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_off
@@ -92,9 +92,9 @@ case $1 in
                     if [[ -n "$token" ]]; then
                         # check power state via lms api
                         DATA='{"id": 1, "method": "slim.request", "params":["'"$token"'", ["power", "?"]]}'
-                        POWER=$(curl -H 'Content-Type: application/json' -d "$DATA" http://$LMS_HOST/jsonrpc.js)
+                        POWER=$(curl -s -H 'Content-Type: application/json' -d "$DATA" http://$LMS_HOST/jsonrpc.js)
                         # empty result if player not registered
-                        if [[ -n $POWER ]]
+                        if [[ -n $POWER ]]; then
                             PLAYER_ON=$(echo $POWER | jq -r '.result._power' )
                             if [[ $PLAYER_ON == 0 ]]; then
                                 ALL_OFF=0
