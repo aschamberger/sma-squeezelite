@@ -108,7 +108,7 @@ case $1 in
                         DATA='{"id": 1, "method": "slim.request", "params":["'"$token"'", ["power", "?"]]}'
                         POWER=$(curl -s -H 'Content-Type: application/json' -d "$DATA" http://$LMS_HOST/jsonrpc.js)
                         # empty result if player not registered
-                        if [[ -n $POWER ]]; then
+                        if [[ -n "$POWER" ]]; then
                             PLAYER_ON=$(echo $POWER | jq -r '.result._power' )
                             if [[ $PLAYER_ON == 1 ]]; then
                                 ALL_OFF=0
