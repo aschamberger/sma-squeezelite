@@ -7,6 +7,11 @@
 #   1: on
 #   2: init
 
+# disable script output by default
+if [[ on != "$DEBUG_POWER_MUTE_SCRIPT" ]]; then
+    echo () { :; }
+fi
+
 # create lock in order to make sure we have exclusive access to GPIO
 exec 200>/var/lock/gpio || exit 1
 flock 200 || exit 1
