@@ -7,6 +7,9 @@
 #   1: on
 #   2: init
 
+PSU_POWER_ON_DELAY="${PSU_POWER_ON_DELAY:-2}"
+PSU_POWER_DOWN_DELAY="${PSU_POWER_DOWN_DELAY:-5}"
+
 # disable script output by default
 if [[ on != "$DEBUG_POWER_MUTE_SCRIPT" ]]; then
     echo () { :; }
@@ -66,7 +69,7 @@ case $1 in
             if [[ $RELAY_ON == 0 ]]; then
                 gpio write $GPIO_PSU_RELAY 1
                 echo -n "PSU relay: $GPIO_PSU_RELAY ..."
-                sleep 2
+                sleep $PSU_POWER_ON_DELAY
             fi
         fi
         if [[ -n "$GPIO_SPS" ]]; then
@@ -149,7 +152,7 @@ case $1 in
             echo -n "SPS: $GPIO_SPS ..."
         fi
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
-            sleep 5
+            sleep $PSU_POWER_DOWN_DELAY
             ALL_OFF=1
             IFS=\;
             for token in $GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN; do
