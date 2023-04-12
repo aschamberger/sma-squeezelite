@@ -1,4 +1,4 @@
-FROM alpine:3.17 as builder
+FROM alpine:3.17.3 as builder
 
 ENV LANG C.UTF-8
 
