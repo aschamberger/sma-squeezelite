@@ -49,7 +49,7 @@ RUN cd /usr/local/src \
     && mkdir -p /usr/lib/alsa-lib \
     && make install
 
-FROM alpine:3.17
+FROM alpine:3.17.3
 
 ENV LANG C.UTF-8
 
