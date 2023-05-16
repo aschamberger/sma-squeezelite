@@ -75,3 +75,7 @@ Notes:
 * [Squeezelite command line options](https://ralph-irving.github.io/squeezelite.html)
 * [Power script example](https://github.com/ralph-irving/squeezelite/blob/master/tools/gpiopower.sh)
 * [flock example](https://www.kiloroot.com/bash-two-methods-for-job-control-simple-lock-files-and-flock/)
+
+## Ideas
+
+* build alpine packages for squeezelite and libs: https://wiki.alpinelinux.org/wiki/Abuild_and_Helpers#Setting_up_the_build_environment

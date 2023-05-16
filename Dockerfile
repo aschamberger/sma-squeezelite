@@ -13,7 +13,11 @@ RUN mkdir -p /usr/local/src \
     && wget https://github.com/TimothyGu/alac/archive/master.zip -O libalac.zip \
     && unzip libalac.zip \
     && wget https://gitlab.xiph.org/xiph/tremor/-/archive/master/tremor-master.zip -O libtremor.zip \
-    && unzip libtremor.zip \
+    && unzip libtremor.zip
+
+COPY load-libtremor-first.patch /usr/local/src/squeezelite-master/alpine/load-libtremor-first.patch
+
+RUN cd /usr/local/src \
     && cd alac-master \
     && patch -p1 -i ../squeezelite-master/alpine/libalac/fix-arm-segfault.patch \
     && patch -p1 -i ../squeezelite-master/alpine/libalac/alac-version.patch \
