@@ -1,4 +1,4 @@
-FROM alpine:3.18.0 as builder
+FROM alpine:3.18.2 as builder
 
 ENV LANG C.UTF-8
 
@@ -53,7 +53,7 @@ RUN cd /usr/local/src \
     && mkdir -p /usr/lib/alsa-lib \
     && make install
 
-FROM alpine:3.18.0
+FROM alpine:3.18.2
 
 ENV LANG C.UTF-8
 
