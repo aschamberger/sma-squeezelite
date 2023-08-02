@@ -60,7 +60,7 @@ ENV LANG C.UTF-8
 RUN apk update \
     && apk add --no-cache tini su-exec flac alsa-lib faad2-libs mpg123-libs libvorbis libmad soxr openssl opusfile libogg curl jq flock
 
-RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing/ --allow-untrusted
+RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted
 
 # add group piaudio and pigpio with gid of underlying raspberry os groups
 RUN addgroup -g 29 -S piaudio \
