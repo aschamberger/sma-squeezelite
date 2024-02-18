@@ -1,4 +1,4 @@
-FROM alpine:3.19.0 as builder
+FROM alpine:3.19.1 as builder
 
 #ARG ALSAEQUAL_VERSION=master
 # use older commit to be compatible with version from raspberry pi OS
@@ -64,7 +64,7 @@ COPY gpio.c /usr/local/src/gpio.c
 RUN cd /usr/local/src \
     && gcc -o gpio gpio.c -Wall -Wextra -Winline -I/usr/include -L/usr/lib -pipe -lwiringPi
     
-FROM alpine:3.19.0
+FROM alpine:3.19.1
 
 ENV LANG C.UTF-8
 
