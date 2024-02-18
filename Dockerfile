@@ -1,26 +1,45 @@
 FROM alpine:3.19.0 as builder
 
+#ARG ALSAEQUAL_VERSION=master
+# use older commit to be compatible with version from raspberry pi OS
+ARG ALSAEQUAL_VERSION=0e9c8c3ed426464609114b9402b71b4cc0edabc9
+#ARG SQUEEZELITE_VERSION=master
+ARG SQUEEZELITE_VERSION=c89faf3280c5dca3f04906a4ff7796a0043e99f0
+
 ENV LANG C.UTF-8
 
 RUN apk update \
-    && apk add --no-cache wget unzip build-base autoconf automake wiringpi wiringpi-dev flac-dev alsa-lib-dev faad2-dev mpg123-dev libvorbis-dev libmad-dev soxr-dev openssl-dev opusfile-dev opus-dev libogg-dev libtool linux-headers
+    && apk add --no-cache build-base alsa-lib-dev linux-headers
 
-RUN mkdir -p /usr/local/src \
-    && cd /usr/local/src \
+RUN mkdir -p /usr/local/src
+
+RUN cd /usr/local/src \
+    # && wget https://github.com/raedwulf/alsaequal/archive/0e9c8c3ed426464609114b9402b71b4cc0edabc9.zip -O alsaequal.zip \
+    && wget https://github.com/raedwulf/alsaequal/archive/$ALSAEQUAL_VERSION.zip -O alsaequal.zip \
+    && unzip alsaequal.zip \
+    && cd alsaequal-$ALSAEQUAL_VERSION \
+    && make \
+    && mkdir -p /usr/lib/alsa-lib \
+    && make install
+    
+RUN apk update \
+    && apk add --no-cache wget unzip autoconf automake wiringpi wiringpi-dev flac-dev faad2-dev mpg123-dev libvorbis-dev libmad-dev soxr-dev openssl-dev opusfile-dev opus-dev libogg-dev libtool
+
+RUN cd /usr/local/src \
     && mkdir dest \
-    && wget https://github.com/ralph-irving/squeezelite/archive/master.zip -O squeezelite.zip \
+    && wget https://github.com/ralph-irving/squeezelite/archive/$SQUEEZELITE_VERSION.zip -O squeezelite.zip \
     && unzip squeezelite.zip \
     && wget https://github.com/TimothyGu/alac/archive/master.zip -O libalac.zip \
     && unzip libalac.zip \
     && wget https://gitlab.xiph.org/xiph/tremor/-/archive/master/tremor-master.zip -O libtremor.zip \
     && unzip libtremor.zip
 
-COPY load-libtremor-first.patch /usr/local/src/squeezelite-master/alpine/load-libtremor-first.patch
+COPY load-libtremor-first.patch /usr/local/src/squeezelite-$SQUEEZELITE_VERSION/alpine/load-libtremor-first.patch
 
 RUN cd /usr/local/src \
     && cd alac-master \
-    && patch -p1 -i ../squeezelite-master/alpine/libalac/fix-arm-segfault.patch \
-    && patch -p1 -i ../squeezelite-master/alpine/libalac/alac-version.patch \
+    && patch -p1 -i ../squeezelite-$SQUEEZELITE_VERSION/alpine/libalac/fix-arm-segfault.patch \
+    && patch -p1 -i ../squeezelite-$SQUEEZELITE_VERSION/alpine/libalac/alac-version.patch \
     && autoreconf -if \
     && ./configure --prefix=/usr \
     && make -j1 \
@@ -34,7 +53,7 @@ RUN cd /usr/local/src \
     && make install \
     && make DESTDIR="/usr/local/src/dest" install \
     && cd .. \
-    && cd squeezelite-master \
+    && cd squeezelite-$SQUEEZELITE_VERSION \
     && patch -p1 -i alpine/load-libtremor-first.patch \
     && make OPTS="-DRESAMPLE -DDSD -DGPIO -DVISEXPORT -DUSE_SSL -DNO_SSLSYM -DOPUS -DALAC -I/usr/include/opus -I/usr/include/alac" \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o find_servers tools/find_servers.c \
@@ -45,14 +64,6 @@ COPY gpio.c /usr/local/src/gpio.c
 RUN cd /usr/local/src \
     && gcc -o gpio gpio.c -Wall -Wextra -Winline -I/usr/include -L/usr/lib -pipe -lwiringPi
     
-RUN cd /usr/local/src \
-    && wget https://github.com/raedwulf/alsaequal/archive/refs/heads/master.zip -O alsaequal.zip \
-    && unzip alsaequal.zip \
-    && cd alsaequal-master \
-    && make \
-    && mkdir -p /usr/lib/alsa-lib \
-    && make install
-
 FROM alpine:3.19.0
 
 ENV LANG C.UTF-8
@@ -75,9 +86,9 @@ RUN touch /etc/asound.conf
 RUN mkdir /config && touch /config/squeeze.name
 
 COPY --from=builder /usr/local/src/dest/usr/lib/* /usr/lib/	
-COPY --from=builder /usr/local/src/squeezelite-master/squeezelite /usr/local/bin/squeezelite
-#COPY --from=builder /usr/local/src/squeezelite-master/alsacap /usr/local/bin/alsacap
-#COPY --from=builder /usr/local/src/squeezelite-master/find_servers /usr/local/bin/find_servers
+COPY --from=builder /usr/local/src/squeezelite-*/squeezelite /usr/local/bin/squeezelite
+#COPY --from=builder /usr/local/src/squeezelite-*/alsacap /usr/local/bin/alsacap
+#COPY --from=builder /usr/local/src/squeezelite-*/find_servers /usr/local/bin/find_servers
 COPY --from=builder /usr/lib/libwiringPi.so* /usr/lib/
 COPY --from=builder /usr/local/src/gpio /usr/local/bin/gpio
 COPY --from=builder /usr/lib/alsa-lib/libasound_module_pcm_equal.so /usr/lib/alsa-lib/libasound_module_pcm_equal.so
