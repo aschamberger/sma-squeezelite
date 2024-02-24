@@ -36,7 +36,7 @@ case $1 in
             echo "Start looping from $INPUT_DEVICE to $OUTPUT_DEVICE."
             nohup arecord -d0 -c2 -f S16_LE -r 44100 -traw -D $INPUT_DEVICE | aplay -c2 -f S16_LE -r 44100 -traw -D $OUTPUT_DEVICE - 1>/dev/null 2>/dev/null &
             echo $! > $PID_FILE
-            cat $PID_FILE
+            cat $PID_FILE > $OUT
         else
             echo "Found .pid file named $PID_FILE. Instance of application already exists. Exiting."
             exit
