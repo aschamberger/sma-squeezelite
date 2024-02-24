@@ -69,7 +69,7 @@ FROM alpine:3.19.1
 ENV LANG C.UTF-8
 
 RUN apk update \
-    && apk add --no-cache tini su-exec flac alsa-lib faad2-libs mpg123-libs libvorbis libmad soxr openssl opusfile libogg curl jq flock
+    && apk add --no-cache tini su-exec flac alsa-lib faad2-libs mpg123-libs libvorbis libmad soxr openssl opusfile libogg curl jq flock alsa-utils
 
 RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted
 
@@ -96,6 +96,8 @@ COPY --from=builder /usr/lib/alsa-lib/libasound_module_ctl_equal.so /usr/lib/als
 
 COPY power_mute.sh /usr/local/bin/power_mute.sh
 RUN chmod +x /usr/local/bin/power_mute.sh
+COPY line_in.sh /usr/local/bin/line_in.sh
+RUN chmod +x /usr/local/bin/line_in.sh
 COPY squeezelite.sh /usr/local/bin/squeezelite.sh
 RUN chmod +x /usr/local/bin/squeezelite.sh
 
