@@ -7,11 +7,6 @@
 #   1: on
 #   2: level
 
-DEBUG_LINE_IN_SCRIPT="on"
-MIXER_DEVICE_LINE="snda"
-SOFTVOL_CONTROL_LINE="SoftVolLi1"
-INPUT_DEVICE="li1_sv"
-
 CHANNEL=$((10#${MAC_ADDRESS:(-2)}))
 PID_FILE="/run/ch${CHANNEL}_line_in.pid"
 
