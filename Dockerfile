@@ -4,7 +4,7 @@ FROM alpine:3.19.1 as builder
 # use older commit to be compatible with version from raspberry pi OS
 ARG ALSAEQUAL_VERSION=0e9c8c3ed426464609114b9402b71b4cc0edabc9
 #ARG SQUEEZELITE_VERSION=master
-ARG SQUEEZELITE_VERSION=c89faf3280c5dca3f04906a4ff7796a0043e99f0
+ARG SQUEEZELITE_VERSION=1847ea444c317e7b0a7f76da064bb911074216a8
 
 ENV LANG C.UTF-8
 
@@ -27,7 +27,8 @@ RUN apk update \
 
 RUN cd /usr/local/src \
     && mkdir dest \
-    && wget https://github.com/ralph-irving/squeezelite/archive/$SQUEEZELITE_VERSION.zip -O squeezelite.zip \
+#    && wget https://github.com/ralph-irving/squeezelite/archive/$SQUEEZELITE_VERSION.zip -O squeezelite.zip \
+    && wget https://github.com/aschamberger/squeezelite/archive/$SQUEEZELITE_VERSION.zip -O squeezelite.zip \
     && unzip squeezelite.zip \
     && wget https://github.com/TimothyGu/alac/archive/master.zip -O libalac.zip \
     && unzip libalac.zip \
@@ -55,7 +56,7 @@ RUN cd /usr/local/src \
     && cd .. \
     && cd squeezelite-$SQUEEZELITE_VERSION \
     && patch -p1 -i alpine/load-libtremor-first.patch \
-    && make OPTS="-DRESAMPLE -DDSD -DGPIO -DVISEXPORT -DUSE_SSL -DNO_SSLSYM -DOPUS -DALAC -I/usr/include/opus -I/usr/include/alac" \
+    && make OPTS="-DRESAMPLE -DDSD -DGPIO -DVISEXPORT -DUSE_SSL -DNO_SSLSYM -DOPUS -DALAC -DLINE_IN -I/usr/include/opus -I/usr/include/alac" \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o find_servers tools/find_servers.c \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o alsacap tools/alsacap.c -lasound 
 
