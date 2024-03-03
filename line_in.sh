@@ -22,14 +22,14 @@ fi
 case $1 in
     # level get
     3)
-        amixer -D $MIXER_DEVICE_LINE sget $SOFTVOL_CONTROL_LINE | awk -F"[][]" '/Left:/ { print substr($2, 1, length($2)-1) }'
+        amixer -D $MIXER_DEVICE_LINE sget $VOLUME_CONTROL_LINE | awk -F"[][]" '/Left:/ { print substr($2, 1, length($2)-1) }'
         exit
         ;;
     # level set
     2)
-        echo "Set volume of $SOFTVOL_CONTROL_LINE to: $2%."
+        echo "Set volume of $VOLUME_CONTROL_LINE to: $2%."
         if [[ ! -z "$2" && $((10#$2)) -ge 0 && $((10#$2)) -le 100 ]]; then
-            amixer -D $MIXER_DEVICE_LINE sset $SOFTVOL_CONTROL_LINE $2% > $OUT
+            amixer -D $MIXER_DEVICE_LINE sset $VOLUME_CONTROL_LINE $2% > $OUT
         else
             echo "Volume must be given betwenn 0 and 100%."
             exit
