@@ -1,11 +1,12 @@
 #!/bin/sh
 
-# squeezelite line-in script
+# squeezelite line in script
 # squeezelite -T /path/to/line_in.sh
 # squeezelite sets $1 to
 #   0: off
 #   1: on
-#   2: level
+#   2: level set
+#   3: level get
 
 CHANNEL=$((10#${MAC_ADDRESS:(-2)}))
 PID_FILE="/run/ch${CHANNEL}_line_in.pid"
@@ -19,7 +20,12 @@ else
 fi
 
 case $1 in
-    # level
+    # level get
+    3)
+        amixer -D $MIXER_DEVICE_LINE sget $SOFTVOL_CONTROL_LINE | awk -F"[][]" '/Left:/ { print substr($2, 1, length($2)-1) }'
+        exit
+        ;;
+    # level set
     2)
         echo "Set volume of $SOFTVOL_CONTROL_LINE to: $2%."
         if [[ ! -z "$2" && $((10#$2)) -ge 0 && $((10#$2)) -le 100 ]]; then
