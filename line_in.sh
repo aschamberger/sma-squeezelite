@@ -22,7 +22,7 @@ fi
 case $1 in
     # level get
     3)
-        amixer -D $MIXER_DEVICE_LINE sget $VOLUME_CONTROL_LINE | awk -F"[][]" '/Left:/ { print substr($2, 1, length($2)-1) }'
+        amixer -D $MIXER_DEVICE_LINE sget $VOLUME_CONTROL_LINE | awk -F"[][]" '/Left:/ { ORS=""; print substr($2, 1, length($2)-1) }'
         exit
         ;;
     # level set
