@@ -3,8 +3,8 @@
 # squeezelite line in script
 # squeezelite -T /path/to/line_in.sh
 # squeezelite sets $1 to
-#   0: off
-#   1: on
+#   0: line in off
+#   1: line in on
 #   2: level set
 #   3: level get
 
