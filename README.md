@@ -75,6 +75,7 @@ Notes:
 * [Squeezelite command line options](https://ralph-irving.github.io/squeezelite.html)
 * [Power script example](https://github.com/ralph-irving/squeezelite/blob/master/tools/gpiopower.sh)
 * [flock example](https://www.kiloroot.com/bash-two-methods-for-job-control-simple-lock-files-and-flock/)
+* https://stackoverflow.com/questions/2829613/how-do-you-tell-if-a-string-contains-another-string-in-posix-sh
 
 ## Ideas
 
