@@ -60,9 +60,9 @@ case $1 in
             fi
         fi
         echo ""
-        ;;
         # release gpio lock
         flock -u 200
+        ;;
     # on
     1)
         # create lock in order to make sure we have exclusive access to GPIO
@@ -199,7 +199,7 @@ case $1 in
             fi
         fi
         echo ""
-        ;;
         # release gpio lock
         flock -u 200
+        ;;
 esac
