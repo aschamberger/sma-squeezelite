@@ -14,7 +14,6 @@ RUN apk update \
 RUN mkdir -p /usr/local/src
 
 RUN cd /usr/local/src \
-    # && wget https://github.com/raedwulf/alsaequal/archive/0e9c8c3ed426464609114b9402b71b4cc0edabc9.zip -O alsaequal.zip \
     && wget https://github.com/raedwulf/alsaequal/archive/$ALSAEQUAL_VERSION.zip -O alsaequal.zip \
     && unzip alsaequal.zip \
     && cd alsaequal-$ALSAEQUAL_VERSION \
@@ -76,7 +75,7 @@ RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpin
 
 # add group piaudio and pigpio with gid of underlying raspberry os groups
 RUN addgroup -g 29 -S piaudio \
-    && addgroup -g 997 -S pigpio \
+    && addgroup -g 993 -S pigpio \
     && adduser -S squeezelite \
     && addgroup squeezelite piaudio \
 	&& addgroup squeezelite pigpio
