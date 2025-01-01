@@ -93,6 +93,7 @@ RUN touch /etc/asound.conf
 RUN mkdir /config && touch /config/squeeze.name
 
 COPY --from=builder /usr/local/src/dest/usr/lib/* /usr/lib/	
+COPY --from=builder /usr/local/src/dest/usr/local/lib/* /usr/local/lib/	
 COPY --from=builder /usr/local/src/squeezelite-*/squeezelite /usr/local/bin/squeezelite
 #COPY --from=builder /usr/local/src/squeezelite-*/alsacap /usr/local/bin/alsacap
 #COPY --from=builder /usr/local/src/squeezelite-*/find_servers /usr/local/bin/find_servers
