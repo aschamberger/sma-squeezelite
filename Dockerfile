@@ -60,16 +60,17 @@ RUN cd /usr/local/src \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o alsacap tools/alsacap.c -lasound 
 
 RUN cd /usr/local/src \
-    && wget https://github.com/joan2937/lg/archive/master.zip -O lgpio.zip \
-    && unzip lgpio.zip \
-    && cd lg-master \
+    && wget https://github.com/WiringPi/WiringPi/archive/master.zip -O WiringPi.zip \
+    && unzip WiringPi.zip \
+    && cd WiringPi-master/wiringPi \
     && make \
-    && make DESTDIR="/usr/local/src/dest" install
+    && make LDCONFIG="" install \
+    && make LDCONFIG="" DESTDIR="/usr/local/src/dest/usr" PREFIX="" install
 
 COPY gpio.c /usr/local/src/gpio.c
 
 RUN cd /usr/local/src \
-    && gcc -O3 -Wall -pthread -o gpio gpio.c -I/usr/local/src/lg-master -L/usr/local/src/lg-master -llgpio
+    && gcc -O3 -Wall -pthread -o gpio gpio.c -lwiringPi
 
 FROM alpine:3.20.3
 
@@ -93,7 +94,6 @@ RUN touch /etc/asound.conf
 RUN mkdir /config && touch /config/squeeze.name
 
 COPY --from=builder /usr/local/src/dest/usr/lib/* /usr/lib/	
-COPY --from=builder /usr/local/src/dest/usr/local/lib/* /usr/local/lib/	
 COPY --from=builder /usr/local/src/squeezelite-*/squeezelite /usr/local/bin/squeezelite
 #COPY --from=builder /usr/local/src/squeezelite-*/alsacap /usr/local/bin/alsacap
 #COPY --from=builder /usr/local/src/squeezelite-*/find_servers /usr/local/bin/find_servers
