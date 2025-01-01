@@ -56,7 +56,7 @@ The speaker switcher GPIO is used to trigger an external 5V relais changing spea
 Additionally an external switch can be controlled via home assistant.
 
 The [power_mute.sh](power_mute.sh) script is automatically configured via the `-S` squeezelite parameter when one of the relevant ENV vars is present in the docker run command. 
-It uses a custom [gpio control binary](gpio.c) based on [WiringPi](https://github.com/WiringPi/WiringPi).
+It uses a custom [gpio control binary](gpio.c) based on [lgpio](https://github.com/joan2937/lg).
 
 [flock](https://linux.die.net/man/1/flock) is used to prevent race conditions of parallel running scripts for different player instances.
 
