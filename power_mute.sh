@@ -71,7 +71,7 @@ case $1 in
         # move on with lock ...
         echo -n "power on $OUTPUT_DEVICE: "
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
-            if [ "${GPIO_AMP_SHUTDOWN_ON_AMP_MUTE#*"$GPIO_MUTE"}" != "$GPIO_AMP_SHUTDOWN_ON_AMP_MUTE" ]; then
+            if [ "${GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN#*"$GPIO_MUTE"}" != "$GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN" ]; then
                 RELAY_ON=$(gpio read $GPIO_PSU_RELAY)
                 if [[ $RELAY_ON == 0 ]]; then
                     gpio write $GPIO_PSU_RELAY 1
