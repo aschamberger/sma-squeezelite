@@ -71,13 +71,24 @@ COPY gpio.c /usr/local/src/gpio.c
 
 RUN cd /usr/local/src \
     && gcc -O3 -Wall -pthread -o gpio gpio.c -lwiringPi
+    
+RUN apk update \
+    && apk add --no-cache autoconf-archive libgudev libgudev-dev
+        
+RUN cd /usr/local/src \
+    && wget https://git.kernel.org/pub/scm/libs/libgpiod/libgpiod.git/snapshot/libgpiod-2.2.tar.gz \
+    && tar xvzf libgpiod-2.2.tar.gz \
+    && cd libgpiod-2.2/ \
+    && ./autogen.sh --enable-bindings-glib --enable-dbus --sysconfdir=/etc \
+    && make \
+    && make DESTDIR="/usr/local/src/dest" install
 
 FROM alpine:3.20.3
 
 ENV LANG C.UTF-8
 
 RUN apk update \
-    && apk add --no-cache tini su-exec flac alsa-lib faad2-libs mpg123-libs libvorbis libmad soxr openssl opusfile libogg curl jq flock alsa-utils
+    && apk add --no-cache tini su-exec flac alsa-lib faad2-libs mpg123-libs libvorbis libmad soxr openssl opusfile libogg curl jq flock alsa-utils libgudev
 
 RUN apk add caps --update-cache --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ --allow-untrusted
 
@@ -98,15 +109,18 @@ COPY --from=builder /usr/local/src/squeezelite-*/squeezelite /usr/local/bin/sque
 #COPY --from=builder /usr/local/src/squeezelite-*/alsacap /usr/local/bin/alsacap
 #COPY --from=builder /usr/local/src/squeezelite-*/find_servers /usr/local/bin/find_servers
 COPY --from=builder /usr/local/src/gpio /usr/local/bin/gpio
+COPY --from=builder /usr/local/src/dest/usr/local/lib/* /usr/local/lib/	
+COPY --from=builder /usr/local/src/dest/usr/local/bin/gpiocli /usr/local/bin/gpiocli
 COPY --from=builder /usr/lib/alsa-lib/libasound_module_pcm_equal.so /usr/lib/alsa-lib/libasound_module_pcm_equal.so
 COPY --from=builder /usr/lib/alsa-lib/libasound_module_ctl_equal.so /usr/lib/alsa-lib/libasound_module_ctl_equal.so
 
-COPY power_mute.sh /usr/local/bin/power_mute.sh
-RUN chmod +x /usr/local/bin/power_mute.sh
-COPY line_in.sh /usr/local/bin/line_in.sh
-RUN chmod +x /usr/local/bin/line_in.sh
-COPY squeezelite.sh /usr/local/bin/squeezelite.sh
-RUN chmod +x /usr/local/bin/squeezelite.sh
+WORKDIR /usr/local/bin
+COPY power_mute.sh power_mute.sh
+RUN chmod +x power_mute.sh
+COPY line_in.sh line_in.sh
+RUN chmod +x line_in.sh
+COPY squeezelite.sh squeezelite.sh
+RUN chmod +x squeezelite.sh
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
 CMD [ "squeezelite.sh" ]
