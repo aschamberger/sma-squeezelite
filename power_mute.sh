@@ -12,9 +12,9 @@ PSU_POWER_DOWN_DELAY="${PSU_POWER_DOWN_DELAY:-5}"
 
 # disable script output by default
 if [[ on != "$DEBUG_POWER_MUTE_SCRIPT" ]]; then
-    ECHO_OUT = /dev/null
+    ECHO_OUT=/dev/null
 else
-    ECHO_OUT = /dev/stdout
+    ECHO_OUT=/dev/stdout
 fi
 
 # physical pin to BCM mapping
