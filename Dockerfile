@@ -58,20 +58,7 @@ RUN cd /usr/local/src \
     && make OPTS="-DRESAMPLE -DDSD -DGPIO -DVISEXPORT -DUSE_SSL -DOPUS -DALAC -DLINE_IN -I/usr/include/opus -I/usr/include/alac" \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o find_servers tools/find_servers.c \
     && gcc -Os -fomit-frame-pointer -fcommon -s -o alsacap tools/alsacap.c -lasound 
-
-RUN cd /usr/local/src \
-    && wget https://github.com/WiringPi/WiringPi/archive/master.zip -O WiringPi.zip \
-    && unzip WiringPi.zip \
-    && cd WiringPi-master/wiringPi \
-    && make \
-    && make LDCONFIG="" install \
-    && make LDCONFIG="" DESTDIR="/usr/local/src/dest/usr" PREFIX="" install
-
-COPY gpio.c /usr/local/src/gpio.c
-
-RUN cd /usr/local/src \
-    && gcc -O3 -Wall -pthread -o gpio gpio.c -lwiringPi
-    
+   
 RUN apk update \
     && apk add --no-cache autoconf-archive libgudev libgudev-dev
         
@@ -108,7 +95,6 @@ COPY --from=builder /usr/local/src/dest/usr/lib/* /usr/lib/
 COPY --from=builder /usr/local/src/squeezelite-*/squeezelite /usr/local/bin/squeezelite
 #COPY --from=builder /usr/local/src/squeezelite-*/alsacap /usr/local/bin/alsacap
 #COPY --from=builder /usr/local/src/squeezelite-*/find_servers /usr/local/bin/find_servers
-COPY --from=builder /usr/local/src/gpio /usr/local/bin/gpio
 COPY --from=builder /usr/local/src/dest/usr/local/lib/* /usr/local/lib/	
 COPY --from=builder /usr/local/src/dest/usr/local/bin/gpiocli /usr/local/bin/gpiocli
 COPY --from=builder /usr/lib/alsa-lib/libasound_module_pcm_equal.so /usr/lib/alsa-lib/libasound_module_pcm_equal.so
