@@ -87,24 +87,24 @@ case $1 in
         exec 200>/var/lock/gpio || exit 1
         flock 200 || exit 1
         # move on with lock ...
-        echo -n "init $OUTPUT_DEVICE: " > ECHO_OUT
+        echo -n "init $OUTPUT_DEVICE: " > $ECHO_OUT
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
-            echo -n "PSU relay: $GPIO_PSU_RELAY ..." > ECHO_OUT
+            echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
             gpio_init $GPIO_PSU_RELAY 0
         fi
         if [[ -n "$GPIO_SPS" ]]; then
-            echo -n "SPS: $GPIO_SPS ..." > ECHO_OUT
+            echo -n "SPS: $GPIO_SPS ..." > $ECHO_OUT
             gpio_init $GPIO_SPS 0
         fi
         if [[ -n "$GPIO_MUTE" ]]; then
-            echo -n "Mute: $GPIO_MUTE ..."  > ECHO_OUT
+            echo -n "Mute: $GPIO_MUTE ..."  > $ECHO_OUT
             gpio_init $GPIO_MUTE 1
         fi
         if [[ -n "$GPIO_SHUTDOWN" ]]; then
-            echo -n "Shutdown: $GPIO_SHUTDOWN ..." > ECHO_OUT
+            echo -n "Shutdown: $GPIO_SHUTDOWN ..." > $ECHO_OUT
             gpio_init $GPIO_SHUTDOWN 1
         fi
-        echo "" > ECHO_OUT
+        echo "" > $ECHO_OUT
         # release gpio lock
         flock -u 200
         ;;
@@ -114,13 +114,13 @@ case $1 in
         exec 200>/var/lock/gpio || exit 1
         flock 200 || exit 1
         # move on with lock ...
-        echo -n "power on $OUTPUT_DEVICE: " > ECHO_OUT
+        echo -n "power on $OUTPUT_DEVICE: " > $ECHO_OUT
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
             if [ "${GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN#*"$GPIO_MUTE"}" != "$GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN" ]; then
                 RELAY_ON=$(gpio_get $GPIO_PSU_RELAY)
                 if [[ $RELAY_ON == 0 ]]; then
                     gpio_set $GPIO_PSU_RELAY 1
-                    echo -n "PSU relay: $GPIO_PSU_RELAY ..." > ECHO_OUT
+                    echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
                     # release gpio lock
                     flock -u 200
                     # wait without lock ...
@@ -134,15 +134,15 @@ case $1 in
         fi
         if [[ -n "$GPIO_SPS" ]]; then
             gpio_set $GPIO_SPS 1
-            echo -n "SPS: $GPIO_SPS ..." > ECHO_OUT
+            echo -n "SPS: $GPIO_SPS ..." > $ECHO_OUT
         fi
         if [[ -n "$GPIO_SHUTDOWN" ]]; then
             gpio_set $GPIO_SHUTDOWN 1
-            echo -n "Shutdown: $GPIO_SHUTDOWN ..." > ECHO_OUT
+            echo -n "Shutdown: $GPIO_SHUTDOWN ..." > $ECHO_OUT
         fi
         if [[ -n "$GPIO_MUTE" ]]; then
             gpio_set $GPIO_MUTE 1
-            echo -n "Mute: $GPIO_MUTE ..." > ECHO_OUT
+            echo -n "Mute: $GPIO_MUTE ..." > $ECHO_OUT
         fi
         # release gpio lock
         flock -u 200
@@ -152,19 +152,19 @@ case $1 in
                 -H "Content-Type: application/json" \
                 -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_on
-            echo -n "HASS switch: $HASS_SWITCH ..." > ECHO_OUT
+            echo -n "HASS switch: $HASS_SWITCH ..." > $ECHO_OUT
         fi
-        echo "" > ECHO_OUT
+        echo "" > $ECHO_OUT
         ;;
     # off
     0)
-        echo -n "power off $OUTPUT_DEVICE: " > ECHO_OUT
+        echo -n "power off $OUTPUT_DEVICE: " > $ECHO_OUT
         if [[ -n "$HASS_SWITCH" ]]; then
             curl -s -X POST -H "Authorization: Bearer $HASS_BEARER" \
                 -H "Content-Type: application/json" \
                 -d '{"entity_id": "'"$HASS_SWITCH"'"}' \
                 http://$HASS_HOST/api/services/switch/turn_off
-            echo -n "HASS switch: $HASS_SWITCH ..." > ECHO_OUT
+            echo -n "HASS switch: $HASS_SWITCH ..." > $ECHO_OUT
         fi
         # create lock in order to make sure we have exclusive access to GPIO
         exec 200>/var/lock/gpio || exit 1
@@ -172,7 +172,7 @@ case $1 in
         # move on with lock ...
         if [[ -n "$GPIO_MUTE" ]]; then
             if [[ -n "$GPIO_AMP_MUTE_ON_PLAYERS" ]]; then
-                echo -n "Mute on players ..." > ECHO_OUT
+                echo -n "Mute on players ..." > $ECHO_OUT
                 ALL_OFF=1
                 IFS=\;
                 for token in $GPIO_AMP_MUTE_ON_PLAYERS; do
@@ -192,31 +192,31 @@ case $1 in
                 done
                 if [[ $ALL_OFF == 1 ]]; then
                     gpio_set $GPIO_MUTE 0
-                    echo -n "Mute: $GPIO_MUTE ..." > ECHO_OUT
+                    echo -n "Mute: $GPIO_MUTE ..." > $ECHO_OUT
                 fi
             else
-                echo -n "Mute on GPIO ..." > ECHO_OUT
+                echo -n "Mute on GPIO ..." > $ECHO_OUT
                 gpio_set $GPIO_MUTE 0
-                echo -n "Mute: $GPIO_MUTE ..." > ECHO_OUT
+                echo -n "Mute: $GPIO_MUTE ..." > $ECHO_OUT
             fi
         fi
         if [[ -n "$GPIO_SHUTDOWN" ]]; then
             if [[ -n "$GPIO_AMP_SHUTDOWN_ON_AMP_MUTE" ]]; then
-                echo -n "Shutdown on mute ($GPIO_AMP_SHUTDOWN_ON_AMP_MUTE) ..." > ECHO_OUT
+                echo -n "Shutdown on mute ($GPIO_AMP_SHUTDOWN_ON_AMP_MUTE) ..." > $ECHO_OUT
                 GPIO_ON=$(gpio_get $GPIO_AMP_SHUTDOWN_ON_AMP_MUTE)
                 if [[ $GPIO_ON == 1 ]]; then
                     gpio_set $GPIO_SHUTDOWN 0
-                    echo -n "Shutdown: $GPIO_SHUTDOWN ..." > ECHO_OUT
+                    echo -n "Shutdown: $GPIO_SHUTDOWN ..." > $ECHO_OUT
                 fi
             else
-                echo -n "Shutdown on GPIO ..."  > ECHO_OUT
+                echo -n "Shutdown on GPIO ..."  > $ECHO_OUT
                 gpio_set $GPIO_SHUTDOWN 0
-                echo -n "Shutdown: $GPIO_SHUTDOWN ..." > ECHO_OUT
+                echo -n "Shutdown: $GPIO_SHUTDOWN ..." > $ECHO_OUT
             fi
         fi
         if [[ -n "$GPIO_SPS" ]]; then
             gpio_set $GPIO_SPS 0
-            echo -n "SPS: $GPIO_SPS ..." > ECHO_OUT
+            echo -n "SPS: $GPIO_SPS ..." > $ECHO_OUT
         fi
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
             # release gpio lock
@@ -240,10 +240,10 @@ case $1 in
             done
             if [[ $ALL_OFF == 1 ]]; then
                 gpio_set $GPIO_PSU_RELAY 0
-                echo -n "PSU relay: $GPIO_PSU_RELAY ..." > ECHO_OUT
+                echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
             fi
         fi
-        echo "" > ECHO_OUT
+        echo "" > $ECHO_OUT
         # release gpio lock
         flock -u 200
         ;;
