@@ -56,7 +56,7 @@ gpio_init()
         ADD_ACTIVE_LOW=" --active-low"
     fi
     
-    gpiocli request --output$ADD_ACTIVE_LOW $BCM=active 1> /dev/null 2> /dev/null
+    gpiocli request --output$ADD_ACTIVE_LOW $BCM 1> /dev/null 2> /dev/null
 }
 
 # $1: GPIO board number
