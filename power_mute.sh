@@ -89,8 +89,10 @@ case $1 in
         # move on with lock ...
         echo -n "init $OUTPUT_DEVICE: " > $ECHO_OUT
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
-            echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
-            gpio_init $GPIO_PSU_RELAY 0
+            if [ "${GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN#*"$GPIO_MUTE"}" != "$GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN" ]; then
+                echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
+                gpio_init $GPIO_PSU_RELAY 0
+            fi
         fi
         if [[ -n "$GPIO_SPS" ]]; then
             echo -n "SPS: $GPIO_SPS ..." > $ECHO_OUT
@@ -219,28 +221,30 @@ case $1 in
             echo -n "SPS: $GPIO_SPS ..." > $ECHO_OUT
         fi
         if [[ -n "$GPIO_PSU_RELAY" ]]; then
-            # release gpio lock
-            flock -u 200
-            # wait without lock ...
-            sleep $PSU_POWER_DOWN_DELAY
-            # create lock in order to make sure we have exclusive access to GPIO
-            exec 200>/var/lock/gpio || exit 1
-            flock 200 || exit 1
-            # move on with lock ...
-            ALL_OFF=1
-            IFS=\;
-            for token in $GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN; do
-                if [[ -n "$token" ]]; then
-                    GPIO_ON=$(gpio_get $token)
-                    if [[ $GPIO_ON == 1 ]]; then
-                        ALL_OFF=0
-                        break
+            if [ "${GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN#*"$GPIO_MUTE"}" != "$GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN" ]; then
+                # release gpio lock
+                flock -u 200
+                # wait without lock ...
+                sleep $PSU_POWER_DOWN_DELAY
+                # create lock in order to make sure we have exclusive access to GPIO
+                exec 200>/var/lock/gpio || exit 1
+                flock 200 || exit 1
+                # move on with lock ...
+                ALL_OFF=1
+                IFS=\;
+                for token in $GPIO_PSU_RELAY_OFF_ON_AMP_SHUTDOWN; do
+                    if [[ -n "$token" ]]; then
+                        GPIO_ON=$(gpio_get $token)
+                        if [[ $GPIO_ON == 1 ]]; then
+                            ALL_OFF=0
+                            break
+                        fi
                     fi
+                done
+                if [[ $ALL_OFF == 1 ]]; then
+                    gpio_set $GPIO_PSU_RELAY 0
+                    echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
                 fi
-            done
-            if [[ $ALL_OFF == 1 ]]; then
-                gpio_set $GPIO_PSU_RELAY 0
-                echo -n "PSU relay: $GPIO_PSU_RELAY ..." > $ECHO_OUT
             fi
         fi
         echo "" > $ECHO_OUT
