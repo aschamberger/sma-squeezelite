@@ -4,7 +4,7 @@ FROM alpine:3.21.0 AS builder
 # use older commit to be compatible with version from raspberry pi OS
 ARG ALSAEQUAL_VERSION=0e9c8c3ed426464609114b9402b71b4cc0edabc9
 #ARG SQUEEZELITE_VERSION=master
-ARG SQUEEZELITE_VERSION=ec48b82526ee2f22d1d105cbcf856f7f2532e1ac
+ARG SQUEEZELITE_VERSION=ab2e447c7bdbc2d6ce82d05413a90b38c920ccbd
 
 ENV LANG C.UTF-8
 
