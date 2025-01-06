@@ -28,4 +28,7 @@ fi
 chmod o+w /dev/stdout
 
 # run squeezelite with user squeezelite
-exec su-exec squeezelite squeezelite -a 80:::0: -N /config/squeeze.name -o $OUTPUT_DEVICE$ALSA_VOLUME_CONTROL -m $MAC_ADDRESS$POWER_SCRIPT$LINE_IN_SCRIPT$ADD_LOGGING
+# https://github.com/ralph-irving/squeezelite/issues/173#issuecomment-1944668435:
+# will start with dac off if you use the name of the device with the -o option not the index number 
+# and you specify the supported sample rates using -r 
+exec su-exec squeezelite squeezelite -a 80:::0: -N /config/squeeze.name -o $OUTPUT_DEVICE -r 48000$ALSA_VOLUME_CONTROL -m $MAC_ADDRESS$POWER_SCRIPT$LINE_IN_SCRIPT$ADD_LOGGING
