@@ -1,4 +1,4 @@
-FROM alpine:3.21.2 AS builder
+FROM alpine:3.21.3 AS builder
 
 #ARG ALSAEQUAL_VERSION=master
 # use older commit to be compatible with version from raspberry pi OS
@@ -70,7 +70,7 @@ RUN cd /usr/local/src \
     && make \
     && make DESTDIR="/usr/local/src/dest" install
 
-FROM alpine:3.21.2
+FROM alpine:3.21.3
 
 ENV LANG C.UTF-8
 
